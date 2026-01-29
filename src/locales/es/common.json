@@ -15,6 +15,7 @@
   "form": {
     "basic": {
       "desc": "Descripción",
+      "hosts": "hosts",
       "labels": {
         "errorFormat": "El formato de la etiqueta es incorrecto, debe ser `clave:valor`",
         "key": "Clave",

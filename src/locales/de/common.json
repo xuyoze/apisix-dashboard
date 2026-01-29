@@ -15,6 +15,7 @@
   "form": {
     "basic": {
       "desc": "Beschreibung",
+      "hosts": "hosts",
       "labels": {
         "errorFormat": "Das Format des Labels ist falsch, es sollte `key:value` sein",
         "key": "Key",

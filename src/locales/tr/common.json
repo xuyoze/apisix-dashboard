@@ -15,6 +15,7 @@
   "form": {
     "basic": {
       "desc": "Açıklama",
+      "hosts": "host",
       "labels": {
         "errorFormat": "Label formatı hatalı, `key:value` şeklinde olmalıdır",
         "key": "Key",

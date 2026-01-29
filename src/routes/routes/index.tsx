@@ -69,11 +69,73 @@ export const RouteList = (props: RouteListProps) => {
         valueType: 'text',
       },
       {
+        dataIndex: ['value', 'hosts'],
+        title: t('form.basic.hosts'),
+        key: 'hosts',
+        valueType: 'text',
+        render: (_, record) => {
+          // 从记录中获取 hosts
+          const hosts = record?.value?.hosts || [];
+          return Array.isArray(hosts) ? hosts.join(', ') : '';
+        }
+      },
+      {
         dataIndex: ['value', 'uri'],
         title: 'URI',
         key: 'uri',
         valueType: 'text',
       },
+      {
+        dataIndex: ['value', 'uris'],
+        title: 'URIS',
+        key: 'uris',
+        valueType: 'text',
+        render: (_, record) => {
+          // 从记录中获取 uris
+          const uris = record?.value?.uris || [];
+          return Array.isArray(uris) ? uris.join(', ') : '';
+        }
+      },
+      {
+        dataIndex: ['value', 'methods'],
+        title: 'Methods',
+        key: 'methods',
+        valueType: 'text',
+        render: (_, record) => {
+          // 从记录中获取 methods
+          const methods = record?.value?.methods || [];
+          return Array.isArray(methods) ? methods.join(', ') : '';
+        }
+      },
+      {
+        dataIndex: ['value', 'status'],
+        title: t('form.basic.status'),
+        key: 'status',
+        valueType: 'select',
+        valueEnum: {
+          1: {
+            text: t('form.basic.statusOption.1'),
+            status: 'Success',
+          },
+          0: {
+            text: t('form.basic.statusOption.0'),
+            status: 'Default',
+          },
+        },
+        render: (_, record) => {
+          const status = record?.value?.status;
+          // 当 status 为 null 或 undefined 时，默认显示为 'Enabled'
+          const statusText = status === 0 ? t('form.basic.statusOption.0') : t('form.basic.statusOption.1');
+          const statusColor = status === 0 ? 'red' : 'green';
+
+          return (
+            <span style={{ color: statusColor }}>
+              {statusText}
+            </span>
+          );
+        }
+      },
+
       {
         title: t('table.actions'),
         valueType: 'option',
