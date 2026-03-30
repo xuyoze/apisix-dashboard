@@ -17,6 +17,7 @@
 import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { createFileRoute } from '@tanstack/react-router';
+import { Tag } from 'antd';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -55,6 +56,7 @@ export const RouteList = (props: RouteListProps) => {
         title: 'ID',
         key: 'id',
         valueType: 'text',
+        hideInTable: true,
       },
       {
         dataIndex: ['value', 'name'],
@@ -74,16 +76,48 @@ export const RouteList = (props: RouteListProps) => {
         key: 'hosts',
         valueType: 'text',
         render: (_, record) => {
-          // 从记录中获取 hosts
-          const hosts = record?.value?.hosts || [];
-          return Array.isArray(hosts) ? hosts.join(', ') : '';
+          // 获取 hosts 和 host 值
+          const hostsValue = record?.value?.hosts || [];
+          const hostValue = record?.value?.host || '';
+
+          // 如果 hosts 是数组且有值，将每个值用 Tag 包裹
+          let hostsElement = null;
+          if (Array.isArray(hostsValue) && hostsValue.length > 0) {
+            hostsElement = (
+              <span>
+                {hostsValue.map((item, index) => (
+                  <Tag key={`hosts-${index}`} style={{ margin: '2px' }}>
+                    {item}
+                  </Tag>
+                ))}
+              </span>
+            );
+          } else if (hostsValue && !Array.isArray(hostsValue)) {
+            // 如果 hosts 不是数组而是单个值
+            hostsElement = <Tag style={{ margin: '2px' }}>{hostsValue}</Tag>;
+          }
+
+          // 如果两个值都存在，则用视觉分割线连接
+          if (hostsElement && hostValue) {
+            return (
+              <span>
+                {hostsElement} <span style={{ margin: '0 4px' }}>—</span> <Tag style={{ margin: '2px' }}>{hostValue}</Tag>
+              </span>
+            );
+          }
+          // 如果只有 hosts 存在
+          else if (hostsElement) {
+            return hostsElement;
+          }
+          // 如果只有 host 存在
+          else if (hostValue) {
+            return <Tag style={{ margin: '2px' }}>{hostValue}</Tag>;
+          }
+          // 如果都没有，则返回空字符串
+          else {
+            return '';
+          }
         }
-      },
-      {
-        dataIndex: ['value', 'uri'],
-        title: 'URI',
-        key: 'uri',
-        valueType: 'text',
       },
       {
         dataIndex: ['value', 'uris'],
@@ -91,9 +125,47 @@ export const RouteList = (props: RouteListProps) => {
         key: 'uris',
         valueType: 'text',
         render: (_, record) => {
-          // 从记录中获取 uris
+          // 从记录中获取 uris 和 uri
           const uris = record?.value?.uris || [];
-          return Array.isArray(uris) ? uris.join(', ') : '';
+          const uri = record?.value?.uri || '';
+          
+          // 如果 uris 是数组且有值，将每个值用 Tag 包裹
+          let urisElement = null;
+          if (Array.isArray(uris) && uris.length > 0) {
+            urisElement = (
+              <span>
+                {uris.map((item, index) => (
+                  <Tag key={index} style={{ margin: '2px' }}>
+                    {item}
+                  </Tag>
+                ))}
+              </span>
+            );
+          } else if (uris && !Array.isArray(uris)) {
+            // 如果 uris 不是数组而是单个值
+            urisElement = <Tag style={{ margin: '2px' }}>{uris}</Tag>;
+          }
+          
+          // 如果两个值都存在，则用视觉分割线连接
+          if (urisElement && uri) {
+            return (
+              <span>
+                {urisElement} <span style={{ margin: '0 4px' }}>—</span> <Tag style={{ margin: '2px' }}>{uri}</Tag>
+              </span>
+            );
+          } 
+          // 如果只有 uris 存在
+          else if (urisElement) {
+            return urisElement;
+          } 
+          // 如果只有 uri 存在
+          else if (uri) {
+            return <Tag style={{ margin: '2px' }}>{uri}</Tag>;
+          }
+          // 如果都没有，则返回空字符串
+          else {
+            return '';
+          }
         }
       },
       {
@@ -104,7 +176,47 @@ export const RouteList = (props: RouteListProps) => {
         render: (_, record) => {
           // 从记录中获取 methods
           const methods = record?.value?.methods || [];
-          return Array.isArray(methods) ? methods.join(', ') : '';
+          
+          if (!Array.isArray(methods) || methods.length === 0) {
+            return '';
+          }
+          
+          // 定义不同HTTP方法对应的颜色
+          const getMethodColor = (method: string) => {
+            const methodUpper = method.toUpperCase();
+            switch (methodUpper) {
+              case 'GET':
+                return 'blue';
+              case 'POST':
+                return 'green';
+              case 'PUT':
+                return 'orange';
+              case 'DELETE':
+                return 'red';
+              case 'PATCH':
+                return 'volcano';
+              case 'HEAD':
+                return 'geekblue';
+              case 'OPTIONS':
+                return 'purple';
+              default:
+                return 'default';
+            }
+          };
+          
+          return (
+            <span>
+              {methods.map((method, index) => (
+                <Tag 
+                  key={index} 
+                  color={getMethodColor(method)} 
+                  style={{ margin: '2px' }}
+                >
+                  {method.toUpperCase()}
+                </Tag>
+              ))}
+            </span>
+          );
         }
       },
       {
