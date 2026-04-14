@@ -183,7 +183,7 @@ const srcRules = tseslint.config({
 });
 
 export default tseslint.config(
-  { ignores: ['dist', 'src/routeTree.gen.ts'] },
+  { ignores: ['dist', 'src/routeTree.gen.ts', '.github/actions'] },
   e2eRules,
   i18nRules,
   srcRules
