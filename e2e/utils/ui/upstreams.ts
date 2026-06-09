@@ -21,19 +21,28 @@ import type { APISIXType } from '@/types/schema/apisix';
 
 import { genTLS } from '../common';
 import type { Test } from '../test';
-import { uiFillHTTPStatuses } from '.';
+import {
+  uiEnsureSettingsClosed,
+  uiFillHTTPStatuses,
+} from '.';
 
 /**
  * Fill the upstream form with required fields
  * @param ctx - Playwright page object or locator
- * @param upstreamName - Name for the upstream
- * @param nodes - Array of upstream nodes
+ * @param upstreamName - Name
  */
 export async function uiFillUpstreamRequiredFields(
   ctx: Page | Locator,
-  upstream: Partial<APISIXType['Upstream']>,
-  page?: Page
+  upstream: Partial<APISIXType['Upstream']>
 ) {
+  // Derive a Page handle for the small settle delays needed between
+  // rapid-fire Add Node clicks (EditableProTable's editable lifecycle
+  // doesn't tolerate clicks during its post-append re-render).
+  const page: Page =
+    typeof (ctx as Locator).page === 'function'
+      ? (ctx as Locator).page()
+      : (ctx as Page);
+
   // Fill in the Name field
   await ctx.getByLabel('Name', { exact: true }).fill(upstream.name);
 
@@ -44,35 +53,39 @@ export async function uiFillUpstreamRequiredFields(
 
   await expect(noData).toBeVisible();
 
-  // Add first node
+  // Add first node — wait for table to settle to a single row before
+  // attempting to type, so the re-render from `ob.append + ob.save` is
+  // done.
   await addNodeBtn.click();
   await expect(noData).toBeHidden();
   const rows = nodesSection.locator('tr.ant-table-row');
+  await expect(rows).toHaveCount(1);
   const firstRowHost = rows.nth(0).getByRole('textbox').first();
   await firstRowHost.fill(upstream.nodes[1].host);
   await expect(firstRowHost).toHaveValue(upstream.nodes[1].host);
 
-  // Add second node - blur first, wait for useClickOutside state sync, then click Add
+  // Add second node. Previously this used `force: true` paired with a
+  // conditional `waitForTimeout(500)` that most callers skipped, leaving a
+  // race against the prior render. We keep `force: true` (the button is
+  // never realistically blocked, and Playwright's stability heuristic can
+  // false-negative on Mantine's hover styles) but also wait for the
+  // post-blur state to stabilize before the click.
   await firstRowHost.blur();
-  if (page) await page.waitForTimeout(500);
-  await addNodeBtn.click();
+  await expect(rows).toHaveCount(1);
+  await expect(firstRowHost).toHaveValue(upstream.nodes[1].host);
+  await page.waitForTimeout(300);
+  await addNodeBtn.click({ force: true });
   await expect(rows).toHaveCount(2, { timeout: 10000 });
   const secondRowHost = rows.nth(1).getByRole('textbox').first();
   await secondRowHost.fill(upstream.nodes[0].host);
   await expect(secondRowHost).toHaveValue(upstream.nodes[0].host);
 
-  // Add a third node and then remove it to test deletion functionality
+  // Add a third node and then remove it to test deletion functionality.
   await secondRowHost.blur();
-  let p: Page;
-  if (
-    typeof (ctx as Locator).page === 'function'
-  ) {
-    p = (ctx as Locator).page();
-  } else {
-    p = ctx as Page;
-  }
-  await p.waitForTimeout(500);
-  await addNodeBtn.click();
+  await expect(rows).toHaveCount(2);
+  await expect(secondRowHost).toHaveValue(upstream.nodes[0].host);
+  await page.waitForTimeout(300);
+  await addNodeBtn.click({ force: true });
   await expect(rows).toHaveCount(3, { timeout: 10000 });
   await rows.nth(2).getByRole('button', { name: 'Delete' }).click();
   await expect(rows).toHaveCount(2);
@@ -100,13 +113,11 @@ export async function uiCheckUpstreamRequiredFields(
 export async function uiFillUpstreamAllFields(
   test: Test,
   ctx: Page | Locator,
-  /**
-   * currently only name and desc are useful,
-   * because I dont want to change too many fields in upstreams related tests
-   */
-  upstream: Partial<APISIXType['Upstream']>,
-  page: Page = ctx as Page
+  upstream: Partial<APISIXType['Upstream']> = {},
+  page: Page = (ctx as Locator).page ? (ctx as Locator).page() : (ctx as Page)
 ) {
+  await uiEnsureSettingsClosed(page);
+
   await test.step('fill in required fields', async () => {
     // Fill in the required fields
     // 1. Name (required)
@@ -156,8 +167,8 @@ export async function uiFillUpstreamAllFields(
 
     // Add the second node - blur any focused input first, then click Add
     await priorityInput.blur();
-    await page.waitForTimeout(500);
-    await addNodeBtn.click();
+    if (page) await page.waitForTimeout(500);
+    await addNodeBtn.click({ force: true });
     await expect(rows).toHaveCount(2, { timeout: 10000 });
 
     // Fill in the Host for the second node - click first then fill
@@ -246,15 +257,17 @@ export async function uiFillUpstreamAllFields(
     await tlsSection
       .getByRole('textbox', { name: 'Client Key', exact: true })
       .fill(tls.key);
-    await tlsSection.getByRole('switch', { name: 'Verify' }).click();
+    await tlsSection.getByText('Verify').scrollIntoViewIfNeeded();
+    await tlsSection.locator('.mantine-Switch-track').click({ force: true });
 
     // 12. Health Check settings
     // Activate active health check
     const healthCheckSection = ctx.getByRole('group', {
       name: 'Health Check',
     });
-    const checksEnabled = ctx.getByTestId('checksEnabled').locator('..');
-    await checksEnabled.click();
+    const checksEnabled = ctx.getByTestId('checksEnabled').locator('..').locator('.mantine-Switch-track');
+    await checksEnabled.scrollIntoViewIfNeeded();
+    await checksEnabled.click({ force: true });
 
     // Set the Healthy part of Active health check settings
     const activeSection = healthCheckSection.getByRole('group', {
@@ -290,11 +303,12 @@ export async function uiFillUpstreamAllFields(
       '503'
     );
 
-    // Activate passive health check
-    await healthCheckSection
+    const checksPassiveEnabled = healthCheckSection
       .getByTestId('checksPassiveEnabled')
       .locator('..')
-      .click();
+      .locator('.mantine-Switch-track');
+    await checksPassiveEnabled.scrollIntoViewIfNeeded();
+    await checksPassiveEnabled.click({ force: true });
 
     // Set the Healthy part of Passive health check settings
     const passiveSection = healthCheckSection.getByRole('group', {

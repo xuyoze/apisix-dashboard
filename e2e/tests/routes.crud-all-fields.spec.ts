@@ -20,6 +20,7 @@ import { e2eReq } from '@e2e/utils/req';
 import { test } from '@e2e/utils/test';
 import {
   uiClearMonacoEditor,
+  uiEnsureSettingsClosed,
   uiFillMonacoEditor,
   uiGetMonacoEditor,
   uiHasToastMsg,
@@ -47,6 +48,7 @@ test.beforeAll(async () => {
 });
 
 test('should CRUD route with all fields', async ({ page }) => {
+  await uiEnsureSettingsClosed(page);
   test.slow();
 
   const varsSection = page.getByRole('group', { name: 'Match Rules' }).getByText('Vars').locator('..');
@@ -152,8 +154,15 @@ test('should CRUD route with all fields', async ({ page }) => {
     await editPluginDialog.getByRole('button', { name: 'Save' }).click();
     await expect(editPluginDialog).toBeHidden();
 
-    // delete basic-auth plugin
+    // delete basic-auth plugin — now requires confirmation per #3342 fix
     await basicAuthPlugin.getByRole('button', { name: 'Delete' }).click();
+    const confirmDeleteDialog = page
+      .getByRole('dialog')
+      .filter({ hasText: /basic-auth/i });
+    await expect(confirmDeleteDialog).toBeVisible({ timeout: 5000 });
+    await confirmDeleteDialog
+      .getByRole('button', { name: 'Delete' })
+      .click();
     await expect(basicAuthPlugin).toBeHidden();
 
     // add real-ip plugin

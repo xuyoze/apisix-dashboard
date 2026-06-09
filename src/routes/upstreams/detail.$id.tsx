@@ -27,15 +27,19 @@ import {
   useNavigate,
   useParams,
 } from '@tanstack/react-router';
-import { useEffect, useMemo } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useBoolean } from 'react-use';
+import type { z } from 'zod';
 
 import { getUpstreamReq, putUpstreamReq } from '@/apis/upstreams';
 import { FormSubmitBtn } from '@/components/form/Btn';
 import { FormPartUpstream } from '@/components/form-slice/FormPartUpstream';
-import { FormPartUpstreamSchema } from '@/components/form-slice/FormPartUpstream/schema';
+import {
+  FormPartUpstreamSchema,
+  type FormPartUpstreamType,
+} from '@/components/form-slice/FormPartUpstream/schema';
 import {
   produceRmEmptyUpstreamFields,
   produceToUpstreamForm,
@@ -46,6 +50,7 @@ import { DeleteResourceBtn } from '@/components/page/DeleteResourceBtn';
 import PageHeader from '@/components/page/PageHeader';
 import { API_UPSTREAMS } from '@/config/constant';
 import { req } from '@/config/req';
+import { useEditCancelGuard } from '@/hooks/useEditCancelGuard';
 import type { APISIXType } from '@/types/schema/apisix';
 import { pipeProduce } from '@/utils/producer';
 
@@ -67,20 +72,20 @@ const UpstreamDetailForm = (
   const { t } = useTranslation();
   const {
     data: { value: upstreamData },
-    isLoading,
     refetch,
   } = useSuspenseQuery(getUpstreamQueryOptions(id));
 
   const formDefaults = useMemo(
-    () => produceToUpstreamForm(upstreamData),
+    () => produceToUpstreamForm(upstreamData) as FormPartUpstreamType,
     [upstreamData]
   );
-
-  const form = useForm({
+  type FormPartUpstreamInput = z.input<typeof FormPartUpstreamSchema>;
+  const form = useForm<FormPartUpstreamInput, unknown, FormPartUpstreamType>({
     resolver: zodResolver(FormPartUpstreamSchema),
     shouldUnregister: true,
     mode: 'all',
     disabled: readOnly,
+    defaultValues: formDefaults,
   });
 
   const putUpstream = useMutation({
@@ -110,21 +115,19 @@ const UpstreamDetailForm = (
   });
 
   useEffect(() => {
-    if (upstreamData && !isLoading) {
-      form.reset(formDefaults);
+    if (upstreamData) {
+      form.reset(produceToUpstreamForm(upstreamData));
     }
-  }, [formDefaults, form, isLoading, upstreamData]);
+  }, [upstreamData, form]);
 
-  if (isLoading) {
-    return <Skeleton height={400} />;
-  }
+  const handleCancel = useEditCancelGuard(form, () => setReadOnly(true));
 
   return (
     <FormTOCBox>
       <FormProvider {...form}>
         <form
-          onSubmit={form.handleSubmit((d) => {
-            putUpstream.mutateAsync(d as APISIXType['Upstream']);
+          onSubmit={form.handleSubmit((d: FormPartUpstreamType) => {
+            putUpstream.mutateAsync(pipeProduce(produceRmEmptyUpstreamFields)(d));
           })}
         >
           <FormSectionGeneral readOnly />
@@ -132,7 +135,7 @@ const UpstreamDetailForm = (
           {!readOnly && (
             <Group>
               <FormSubmitBtn>{t('form.btn.save')}</FormSubmitBtn>
-              <Button variant="outline" onClick={() => setReadOnly(true)}>
+              <Button variant="outline" onClick={handleCancel}>
                 {t('form.btn.cancel')}
               </Button>
             </Group>
@@ -175,11 +178,13 @@ function RouteComponent() {
           ),
         })}
       />
-      <UpstreamDetailForm
-        id={id}
-        readOnly={readOnly}
-        setReadOnly={setReadOnly}
-      />
+      <Suspense fallback={<Skeleton height={400} />}>
+        <UpstreamDetailForm
+          id={id}
+          readOnly={readOnly}
+          setReadOnly={setReadOnly}
+        />
+      </Suspense>
     </>
   );
 }
