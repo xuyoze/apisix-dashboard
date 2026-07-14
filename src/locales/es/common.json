@@ -371,5 +371,9 @@
   },
   "upstreams": {
     "singular": "Upstream"
+  },
+  "error": {
+    "title": "Algo salió mal",
+    "retry": "Reintentar"
   }
 }
