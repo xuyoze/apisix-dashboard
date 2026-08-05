@@ -13,10 +13,12 @@
     "singular": "Credencial"
   },
   "docs": "Documentación",
+  "empty": {
+    "description": "Aún no hay {{name}}"
+  },
   "form": {
     "basic": {
       "desc": "Descripción",
-      "hosts": "hosts",
       "labels": {
         "errorFormat": "El formato de la etiqueta es incorrecto, debe ser `clave:valor`",
         "key": "Clave",
@@ -36,6 +38,8 @@
       "add": "Añadir",
       "addARow": "Añadir una fila",
       "cancel": "Cancelar",
+      "copied": "Copiado",
+      "copy": "Copiar",
       "delete": "Eliminar",
       "edit": "Editar",
       "save": "Guardar",
@@ -62,6 +66,7 @@
     "plugins": {
       "addPlugin": "Añadir Plugin",
       "configId": "ID de Configuración de Plugin",
+      "docsFor": "Documentación de {{name}}",
       "editPlugin": "Editar Plugin",
       "hideSecrets": "Ocultar secretos",
       "label": "Plugins",
@@ -75,6 +80,11 @@
     "protos": {
       "content": "Contenido",
       "contentPlaceholder": "Pegar o subir archivo {{fileTypes}}"
+    },
+    "ref": {
+      "view": "Ver {{name}}",
+      "viewNamed": "Ver {{resource}}: {{name}}",
+      "missing": "{{name}} con este ID no existe"
     },
     "routes": {
       "enableWebsocket": "Habilitar WebSocket",
@@ -306,7 +316,8 @@
       "confirm": "¿Está seguro de que desea eliminar <0>{{name}}</0>?"
     },
     "detail": {
-      "title": "Detalle de {{name}}"
+      "title": "Detalle de {{name}}",
+      "titleWithId": "{{name}} · {{id}}"
     },
     "edit": {
       "success": "Editado {{name}} con éxito",
@@ -341,8 +352,7 @@
     "singular": "Secreto"
   },
   "services": {
-    "singular": "Servicio",
-    "empty": "No se encontraron servicios. Haga clic en Añadir Servicio para crear el primero."
+    "singular": "Servicio"
   },
   "settings": {
     "adminKey": "Clave de Administrador",
@@ -375,12 +385,37 @@
     "disabled": "Deshabilitado",
     "enabled": "Habilitado"
   },
+  "test": {
+    "title": "Test request",
+    "entry": "Test",
+    "gatewayUrl": "Gateway URL",
+    "gatewayUrlPlaceholder": "http://127.0.0.1:9080",
+    "gatewayUrlRequired": "Set the gateway URL first",
+    "method": "Method",
+    "path": "Path",
+    "wildcardHint": "Replace the wildcard/regex with a concrete path",
+    "headers": "Headers",
+    "addHeader": "Add header",
+    "removeHeader": "Remove header",
+    "body": "Body",
+    "curl": "curl",
+    "copy": "Copy",
+    "copied": "Copied",
+    "send": "Send request",
+    "response": "Response",
+    "responseHeaders": "Headers",
+    "blocked": "The browser couldn't read a response (likely cross-origin or unreachable). Copy the command above and run it in a terminal."
+  },
   "upstreams": {
     "singular": "Upstream"
   },
   "error": {
     "title": "Algo salió mal",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "notFound": {
+      "description": "{{name}} no existe o se ha eliminado.",
+      "back": "Volver a {{name}}"
+    }
   },
   "a11y": {
     "openSettings": "Open settings",

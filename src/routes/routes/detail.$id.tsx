@@ -48,7 +48,9 @@ import {
 import { FormTOCBox } from '@/components/form-slice/FormSection';
 import { FormSectionGeneral } from '@/components/form-slice/FormSectionGeneral';
 import { DeleteResourceBtn } from '@/components/page/DeleteResourceBtn';
+import { genDetailErrorComponent } from '@/components/page/DetailNotFound';
 import PageHeader from '@/components/page/PageHeader';
+import { RouteTestDrawer } from '@/components/page/RouteTestDrawer';
 import { API_ROUTES } from '@/config/constant';
 import { req } from '@/config/req';
 import { useEditCancelGuard } from '@/hooks/useEditCancelGuard';
@@ -142,32 +144,52 @@ export const RouteDetail = (props: RouteDetailProps) => {
   const { id, onDeleteSuccess } = props;
   const { t } = useTranslation();
   const [readOnly, setReadOnly] = useBoolean(true);
+  const [testOpened, setTestOpened] = useBoolean(false);
 
   return (
     <>
       <PageHeader
         title={t('info.edit.title', { name: t('routes.singular') })}
+        extra={
+          <Group>
+            <Button
+              onClick={() => setTestOpened(true)}
+              size="compact-sm"
+              variant="light"
+            >
+              {t('test.entry')}
+            </Button>
+            {readOnly && (
+              <>
+                <Button
+                  onClick={() => setReadOnly(false)}
+                  size="compact-sm"
+                  variant="gradient"
+                >
+                  {t('form.btn.edit')}
+                </Button>
+                <DeleteResourceBtn
+                  mode="detail"
+                  name={t('routes.singular')}
+                  target={id}
+                  api={`${API_ROUTES}/${id}`}
+                  onSuccess={onDeleteSuccess}
+                />
+              </>
+            )}
+          </Group>
+        }
         {...(readOnly && {
-          title: t('info.detail.title', { name: t('routes.singular') }),
-          extra: (
-            <Group>
-              <Button
-                onClick={() => setReadOnly(false)}
-                size="compact-sm"
-                variant="gradient"
-              >
-                {t('form.btn.edit')}
-              </Button>
-              <DeleteResourceBtn
-                mode="detail"
-                name={t('routes.singular')}
-                target={id}
-                api={`${API_ROUTES}/${id}`}
-                onSuccess={onDeleteSuccess}
-              />
-            </Group>
-          ),
+          title: t('info.detail.titleWithId', {
+            name: t('routes.singular'),
+            id,
+          }),
         })}
+      />
+      <RouteTestDrawer
+        opened={testOpened}
+        onClose={() => setTestOpened(false)}
+        id={id}
       />
       <Suspense
         fallback={
@@ -198,4 +220,9 @@ function RouteComponent() {
 
 export const Route = createFileRoute('/routes/detail/$id')({
   component: RouteComponent,
+  errorComponent: genDetailErrorComponent({
+    idParam: 'id',
+    resource: 'routes',
+    to: '/routes',
+  }),
 });

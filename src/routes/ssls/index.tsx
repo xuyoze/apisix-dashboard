@@ -21,7 +21,9 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getSSLListQueryOptions, useSSLList } from '@/apis/hooks';
+import { CopyableId } from '@/components/page/CopyableId';
 import { DeleteResourceBtn } from '@/components/page/DeleteResourceBtn';
+import { ListEmptyState } from '@/components/page/ListEmptyState';
 import PageHeader from '@/components/page/PageHeader';
 import { ToAddPageBtn, ToDetailPageBtn } from '@/components/page/ToAddPageBtn';
 import { AntdConfigProvider } from '@/config/antdConfigProvider';
@@ -41,6 +43,7 @@ function RouteComponent() {
         title: 'ID',
         key: 'id',
         valueType: 'text',
+        render: (_, record) => <CopyableId value={record.value.id} />,
       },
       {
         dataIndex: ['value', 'sni'],
@@ -93,6 +96,9 @@ function RouteComponent() {
       <PageHeader title={t('sources.ssls')} />
       <AntdConfigProvider>
         <ProTable
+          locale={{
+            emptyText: <ListEmptyState resource="ssls" />,
+          }}
           columns={columns}
           dataSource={data?.list}
           rowKey="id"

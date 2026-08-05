@@ -21,7 +21,9 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getGlobalRuleListQueryOptions, useGlobalRuleList } from '@/apis/hooks';
+import { CopyableId } from '@/components/page/CopyableId';
 import { DeleteResourceBtn } from '@/components/page/DeleteResourceBtn';
+import { ListEmptyState } from '@/components/page/ListEmptyState';
 import PageHeader from '@/components/page/PageHeader';
 import { ToAddPageBtn, ToDetailPageBtn } from '@/components/page/ToAddPageBtn';
 import { AntdConfigProvider } from '@/config/antdConfigProvider';
@@ -56,6 +58,7 @@ function GlobalRulesList() {
         title: 'ID',
         key: 'id',
         valueType: 'text',
+        render: (_, record) => <CopyableId value={record.value.id} />,
       },
       {
         title: t('table.actions'),
@@ -83,6 +86,9 @@ function GlobalRulesList() {
   return (
     <AntdConfigProvider>
       <ProTable
+        locale={{
+          emptyText: <ListEmptyState resource="globalRules" />,
+        }}
         columns={columns}
         dataSource={data.list}
         rowKey="id"

@@ -21,7 +21,9 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getConsumerGroupListQueryOptions, useConsumerGroupList } from '@/apis/hooks';
+import { CopyableId } from '@/components/page/CopyableId';
 import { DeleteResourceBtn } from '@/components/page/DeleteResourceBtn';
+import { ListEmptyState } from '@/components/page/ListEmptyState';
 import PageHeader from '@/components/page/PageHeader';
 import { ToAddPageBtn, ToDetailPageBtn } from '@/components/page/ToAddPageBtn';
 import { AntdConfigProvider } from '@/config/antdConfigProvider';
@@ -43,6 +45,7 @@ function ConsumerGroupsList() {
         title: 'ID',
         key: 'id',
         valueType: 'text',
+        render: (_, record) => <CopyableId value={record.value.id} />,
       },
       {
         dataIndex: ['value', 'name'],
@@ -93,6 +96,9 @@ function ConsumerGroupsList() {
   return (
     <AntdConfigProvider>
       <ProTable
+        locale={{
+          emptyText: <ListEmptyState resource="consumerGroups" />,
+        }}
         columns={columns}
         dataSource={data.list}
         rowKey="id"

@@ -13,10 +13,12 @@
     "singular": "Anmeldeinformation"
   },
   "docs": "Dokumentation",
+  "empty": {
+    "description": "Noch keine {{name}}"
+  },
   "form": {
     "basic": {
       "desc": "Beschreibung",
-      "hosts": "hosts",
       "labels": {
         "errorFormat": "Das Format des Labels ist falsch, es sollte `key:value` sein",
         "key": "Key",
@@ -36,6 +38,8 @@
       "add": "Hinzufügen",
       "addARow": "Zeile hinzufügen",
       "cancel": "Abbrechen",
+      "copied": "Kopiert",
+      "copy": "Kopieren",
       "delete": "Löschen",
       "edit": "Bearbeiten",
       "save": "Speichern",
@@ -62,6 +66,7 @@
     "plugins": {
       "addPlugin": "Plugin hinzufügen",
       "configId": "Plugin-Konfigurations-ID",
+      "docsFor": "Dokumentation zu {{name}}",
       "editPlugin": "Plugin bearbeiten",
       "hideSecrets": "Geheimnisse verbergen",
       "label": "Plugins",
@@ -75,6 +80,11 @@
     "protos": {
       "content": "Inhalt",
       "contentPlaceholder": "Datei {{fileTypes}} einfügen oder hochladen"
+    },
+    "ref": {
+      "view": "{{name}} anzeigen",
+      "viewNamed": "{{resource}} anzeigen: {{name}}",
+      "missing": "{{name}} mit dieser ID existiert nicht"
     },
     "routes": {
       "enableWebsocket": "WebSocket aktivieren",
@@ -306,7 +316,8 @@
       "confirm": "Möchten Sie <0>{{name}}</0> wirklich löschen?"
     },
     "detail": {
-      "title": "{{name}} Detail"
+      "title": "{{name}} Detail",
+      "titleWithId": "{{name}} · {{id}}"
     },
     "edit": {
       "success": "{{name}} erfolgreich bearbeitet",
@@ -341,8 +352,7 @@
     "singular": "Secret"
   },
   "services": {
-    "singular": "Service",
-    "empty": "Keine Services gefunden. Klicken Sie auf Service hinzufügen, um Ihren ersten zu erstellen."
+    "singular": "Service"
   },
   "settings": {
     "adminKey": "Admin Key",
@@ -375,12 +385,37 @@
     "disabled": "Deaktiviert",
     "enabled": "Aktiviert"
   },
+  "test": {
+    "title": "Test request",
+    "entry": "Test",
+    "gatewayUrl": "Gateway URL",
+    "gatewayUrlPlaceholder": "http://127.0.0.1:9080",
+    "gatewayUrlRequired": "Set the gateway URL first",
+    "method": "Method",
+    "path": "Path",
+    "wildcardHint": "Replace the wildcard/regex with a concrete path",
+    "headers": "Headers",
+    "addHeader": "Add header",
+    "removeHeader": "Remove header",
+    "body": "Body",
+    "curl": "curl",
+    "copy": "Copy",
+    "copied": "Copied",
+    "send": "Send request",
+    "response": "Response",
+    "responseHeaders": "Headers",
+    "blocked": "The browser couldn't read a response (likely cross-origin or unreachable). Copy the command above and run it in a terminal."
+  },
   "upstreams": {
     "singular": "Upstream"
   },
   "error": {
     "title": "Etwas ist schiefgelaufen",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "notFound": {
+      "description": "{{name}} existiert nicht oder wurde gelöscht.",
+      "back": "Zurück zu {{name}}"
+    }
   },
   "a11y": {
     "openSettings": "Open settings",

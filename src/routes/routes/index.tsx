@@ -17,13 +17,14 @@
 import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { createFileRoute } from '@tanstack/react-router';
-import { Tag } from 'antd';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getRouteListQueryOptions, useRouteList } from '@/apis/hooks';
 import type { WithServiceIdFilter } from '@/apis/routes';
+import { CopyableId } from '@/components/page/CopyableId';
 import { DeleteResourceBtn } from '@/components/page/DeleteResourceBtn';
+import { ListEmptyState } from '@/components/page/ListEmptyState';
 import PageHeader from '@/components/page/PageHeader';
 import { ToAddPageBtn, ToDetailPageBtn } from '@/components/page/ToAddPageBtn';
 import { AntdConfigProvider } from '@/config/antdConfigProvider';
@@ -56,7 +57,7 @@ export const RouteList = (props: RouteListProps) => {
         title: 'ID',
         key: 'id',
         valueType: 'text',
-        hideInTable: true,
+        render: (_, record) => <CopyableId value={record.value.id} />,
       },
       {
         dataIndex: ['value', 'name'],
@@ -71,183 +72,11 @@ export const RouteList = (props: RouteListProps) => {
         valueType: 'text',
       },
       {
-        dataIndex: ['value', 'hosts'],
-        title: t('form.basic.hosts'),
-        key: 'hosts',
+        dataIndex: ['value', 'uri'],
+        title: 'URI',
+        key: 'uri',
         valueType: 'text',
-        render: (_, record) => {
-          // 获取 hosts 和 host 值
-          const hostsValue = record?.value?.hosts || [];
-          const hostValue = record?.value?.host || '';
-
-          // 如果 hosts 是数组且有值，将每个值用 Tag 包裹
-          let hostsElement = null;
-          if (Array.isArray(hostsValue) && hostsValue.length > 0) {
-            hostsElement = (
-              <span>
-                {hostsValue.map((item, index) => (
-                  <Tag key={`hosts-${index}`} style={{ margin: '2px' }}>
-                    {item}
-                  </Tag>
-                ))}
-              </span>
-            );
-          } else if (hostsValue && !Array.isArray(hostsValue)) {
-            // 如果 hosts 不是数组而是单个值
-            hostsElement = <Tag style={{ margin: '2px' }}>{hostsValue}</Tag>;
-          }
-
-          // 如果两个值都存在，则用视觉分割线连接
-          if (hostsElement && hostValue) {
-            return (
-              <span>
-                {hostsElement} <span style={{ margin: '0 4px' }}>—</span> <Tag style={{ margin: '2px' }}>{hostValue}</Tag>
-              </span>
-            );
-          }
-          // 如果只有 hosts 存在
-          else if (hostsElement) {
-            return hostsElement;
-          }
-          // 如果只有 host 存在
-          else if (hostValue) {
-            return <Tag style={{ margin: '2px' }}>{hostValue}</Tag>;
-          }
-          // 如果都没有，则返回空字符串
-          else {
-            return '';
-          }
-        }
       },
-      {
-        dataIndex: ['value', 'uris'],
-        title: 'URIS',
-        key: 'uris',
-        valueType: 'text',
-        render: (_, record) => {
-          // 从记录中获取 uris 和 uri
-          const uris = record?.value?.uris || [];
-          const uri = record?.value?.uri || '';
-          
-          // 如果 uris 是数组且有值，将每个值用 Tag 包裹
-          let urisElement = null;
-          if (Array.isArray(uris) && uris.length > 0) {
-            urisElement = (
-              <span>
-                {uris.map((item, index) => (
-                  <Tag key={index} style={{ margin: '2px' }}>
-                    {item}
-                  </Tag>
-                ))}
-              </span>
-            );
-          } else if (uris && !Array.isArray(uris)) {
-            // 如果 uris 不是数组而是单个值
-            urisElement = <Tag style={{ margin: '2px' }}>{uris}</Tag>;
-          }
-          
-          // 如果两个值都存在，则用视觉分割线连接
-          if (urisElement && uri) {
-            return (
-              <span>
-                {urisElement} <span style={{ margin: '0 4px' }}>—</span> <Tag style={{ margin: '2px' }}>{uri}</Tag>
-              </span>
-            );
-          } 
-          // 如果只有 uris 存在
-          else if (urisElement) {
-            return urisElement;
-          } 
-          // 如果只有 uri 存在
-          else if (uri) {
-            return <Tag style={{ margin: '2px' }}>{uri}</Tag>;
-          }
-          // 如果都没有，则返回空字符串
-          else {
-            return '';
-          }
-        }
-      },
-      {
-        dataIndex: ['value', 'methods'],
-        title: 'Methods',
-        key: 'methods',
-        valueType: 'text',
-        render: (_, record) => {
-          // 从记录中获取 methods
-          const methods = record?.value?.methods || [];
-          
-          if (!Array.isArray(methods) || methods.length === 0) {
-            return '';
-          }
-          
-          // 定义不同HTTP方法对应的颜色
-          const getMethodColor = (method: string) => {
-            const methodUpper = method.toUpperCase();
-            switch (methodUpper) {
-              case 'GET':
-                return 'blue';
-              case 'POST':
-                return 'green';
-              case 'PUT':
-                return 'orange';
-              case 'DELETE':
-                return 'red';
-              case 'PATCH':
-                return 'volcano';
-              case 'HEAD':
-                return 'geekblue';
-              case 'OPTIONS':
-                return 'purple';
-              default:
-                return 'default';
-            }
-          };
-          
-          return (
-            <span>
-              {methods.map((method, index) => (
-                <Tag 
-                  key={index} 
-                  color={getMethodColor(method)} 
-                  style={{ margin: '2px' }}
-                >
-                  {method.toUpperCase()}
-                </Tag>
-              ))}
-            </span>
-          );
-        }
-      },
-      {
-        dataIndex: ['value', 'status'],
-        title: t('form.basic.status'),
-        key: 'status',
-        valueType: 'select',
-        valueEnum: {
-          1: {
-            text: t('form.basic.statusOption.1'),
-            status: 'Success',
-          },
-          0: {
-            text: t('form.basic.statusOption.0'),
-            status: 'Default',
-          },
-        },
-        render: (_, record) => {
-          const status = record?.value?.status;
-          // 当 status 为 null 或 undefined 时，默认显示为 'Enabled'
-          const statusText = status === 0 ? t('form.basic.statusOption.0') : t('form.basic.statusOption.1');
-          const statusColor = status === 0 ? 'red' : 'green';
-
-          return (
-            <span style={{ color: statusColor }}>
-              {statusText}
-            </span>
-          );
-        }
-      },
-
       {
         title: t('table.actions'),
         valueType: 'option',
@@ -270,6 +99,9 @@ export const RouteList = (props: RouteListProps) => {
   return (
     <AntdConfigProvider>
       <ProTable
+        locale={{
+          emptyText: <ListEmptyState resource="routes" />,
+        }}
         columns={columns}
         dataSource={data.list}
         rowKey="id"

@@ -13,10 +13,12 @@
     "singular": "Credential"
   },
   "docs": "Dokümanlar",
+  "empty": {
+    "description": "Henüz {{name}} yok"
+  },
   "form": {
     "basic": {
       "desc": "Açıklama",
-      "hosts": "host",
       "labels": {
         "errorFormat": "Label formatı hatalı, `key:value` şeklinde olmalıdır",
         "key": "Key",
@@ -36,6 +38,8 @@
       "add": "Ekle",
       "addARow": "Satır ekle",
       "cancel": "İptal",
+      "copied": "Kopyalandı",
+      "copy": "Kopyala",
       "delete": "Sil",
       "edit": "Düzenle",
       "save": "Kaydet",
@@ -62,6 +66,7 @@
     "plugins": {
       "addPlugin": "Plugin Ekle",
       "configId": "Plugin Config ID",
+      "docsFor": "{{name}} dokümantasyonu",
       "editPlugin": "Plugin Düzenle",
       "hideSecrets": "Gizli değerleri gizle",
       "label": "Plugin'ler",
@@ -75,6 +80,11 @@
     "protos": {
       "content": "İçerik",
       "contentPlaceholder": "{{fileTypes}} dosyasını yapıştırın veya yükleyin"
+    },
+    "ref": {
+      "view": "{{name}} görüntüle",
+      "viewNamed": "{{resource}} görüntüle: {{name}}",
+      "missing": "Bu ID'ye sahip {{name}} yok"
     },
     "routes": {
       "enableWebsocket": "WebSocket Aktif",
@@ -306,7 +316,8 @@
       "confirm": "<0>{{name}}</0> öğesini silmek istediğinizden emin misiniz?"
     },
     "detail": {
-      "title": "{{name}} Detay"
+      "title": "{{name}} Detay",
+      "titleWithId": "{{name}} · {{id}}"
     },
     "edit": {
       "success": "{{name}} başarıyla güncellendi",
@@ -341,8 +352,7 @@
     "singular": "Secret"
   },
   "services": {
-    "singular": "Service",
-    "empty": "Service bulunamadı. İlk Service'inizi oluşturmak için Service Ekle'ye tıklayın."
+    "singular": "Service"
   },
   "settings": {
     "adminKey": "Admin Key",
@@ -375,12 +385,37 @@
     "disabled": "Pasif",
     "enabled": "Aktif"
   },
+  "test": {
+    "title": "Test request",
+    "entry": "Test",
+    "gatewayUrl": "Gateway URL",
+    "gatewayUrlPlaceholder": "http://127.0.0.1:9080",
+    "gatewayUrlRequired": "Set the gateway URL first",
+    "method": "Method",
+    "path": "Path",
+    "wildcardHint": "Replace the wildcard/regex with a concrete path",
+    "headers": "Headers",
+    "addHeader": "Add header",
+    "removeHeader": "Remove header",
+    "body": "Body",
+    "curl": "curl",
+    "copy": "Copy",
+    "copied": "Copied",
+    "send": "Send request",
+    "response": "Response",
+    "responseHeaders": "Headers",
+    "blocked": "The browser couldn't read a response (likely cross-origin or unreachable). Copy the command above and run it in a terminal."
+  },
   "upstreams": {
     "singular": "Upstream"
   },
   "error": {
     "title": "Bir şeyler ters gitti",
-    "retry": "Yeniden dene"
+    "retry": "Yeniden dene",
+    "notFound": {
+      "description": "{{name}} bulunamadı. Silinmiş olabilir.",
+      "back": "{{name}} listesine dön"
+    }
   },
   "a11y": {
     "openSettings": "Open settings",
