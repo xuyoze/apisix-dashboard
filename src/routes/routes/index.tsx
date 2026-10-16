@@ -72,10 +72,32 @@ export const RouteList = (props: RouteListProps) => {
         valueType: 'text',
       },
       {
-        dataIndex: ['value', 'uri'],
-        title: 'URI',
-        key: 'uri',
+        dataIndex: ['value', 'hosts'],
+        title: t('form.routes.hosts'),
+        key: 'hosts',
         valueType: 'text',
+        render: (_, record) => {
+          const hosts = record.value.hosts?.length
+            ? record.value.hosts
+            : record.value.host
+              ? [record.value.host]
+              : [];
+          return hosts.length > 0 ? hosts.join(', ') : '-';
+        },
+      },
+      {
+        dataIndex: ['value', 'uris'],
+        title: t('form.routes.uris'),
+        key: 'uris',
+        valueType: 'text',
+        render: (_, record) => {
+          const uris = record.value.uris?.length
+            ? record.value.uris
+            : record.value.uri
+              ? [record.value.uri]
+              : [];
+          return uris.length > 0 ? uris.join(', ') : '-';
+        },
       },
       {
         title: t('table.actions'),

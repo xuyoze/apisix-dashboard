@@ -39,7 +39,8 @@ test('should navigate to routes page', async ({ page }) => {
     await expect(table).toBeVisible();
     await expect(table.getByText('ID', { exact: true })).toBeVisible();
     await expect(table.getByText('Name', { exact: true })).toBeVisible();
-    await expect(table.getByText('URI', { exact: true })).toBeVisible();
+    await expect(table.getByText('Hosts', { exact: true })).toBeVisible();
+    await expect(table.getByText('URIs', { exact: true })).toBeVisible();
     await expect(table.getByText('Actions', { exact: true })).toBeVisible();
   });
 });
@@ -48,6 +49,9 @@ const routes: APISIXType['Route'][] = Array.from({ length: 11 }, (_, i) => ({
   id: `route_id_${i + 1}`,
   name: `route_name_${i + 1}`,
   uri: `/test_route_${i + 1}`,
+  host: i === 0 ? 'legacy.example.com' : undefined,
+  hosts:
+    i === 1 ? ['first.example.com', 'second.example.com'] : undefined,
   desc: `Description for route ${i + 1}`,
   methods: ['GET'],
   upstream: {
@@ -73,6 +77,23 @@ test.describe('page and page_size should work correctly', () => {
     await Promise.all(
       routes.map((d) => e2eReq.delete(`${API_ROUTES}/${d.id}`))
     );
+  });
+
+  test('should display hosts and fall back to the single host', async ({
+    page,
+  }) => {
+    await routesPom.toIndex(page);
+
+    const table = page.getByRole('table');
+    await expect(
+      table.getByRole('cell', { name: 'legacy.example.com', exact: true })
+    ).toBeVisible();
+    await expect(
+      table.getByRole('cell', {
+        name: 'first.example.com, second.example.com',
+        exact: true,
+      })
+    ).toBeVisible();
   });
 
   // Setup pagination tests with route-specific configurations
