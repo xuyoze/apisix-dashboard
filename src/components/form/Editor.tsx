@@ -116,7 +116,7 @@ export const FormItemEditor = <T extends FieldValues>(
         schema: customSchema,
       });
     }
-    monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+    monaco.json.jsonDefaults.setDiagnosticsOptions({
       validate: true,
       schemas,
       trailingCommas: 'error',
@@ -163,7 +163,13 @@ export const FormItemEditor = <T extends FieldValues>(
           trigger(props.name);
         }}
         onMount={(editor) => {
-          if (process.env.NODE_ENV !== 'production') {
+          // test seam for the Playwright Monaco helpers. Keyed on the Vite
+          // mode, not NODE_ENV: the e2e image is a production build
+          // (`vite build --mode test`) so it runs the same React the
+          // release ships — a NODE_ENV=test build bundled development
+          // React, whose StrictMode double effects hid submit-body bugs
+          // (#3395)
+          if (import.meta.env.DEV || import.meta.env.MODE === 'test') {
             window.__monacoEditor__ = editor;
           }
         }}
